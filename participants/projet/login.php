@@ -1,5 +1,5 @@
 <?php session_start();
-
+$_SESSION['log']="";
 
 if(isset($_POST['login'])){
 
@@ -8,6 +8,9 @@ if(isset($_POST['login'])){
 if($email=='admin@admin' && $password=='admin'){
 	$_SESSION['log']="login";
 	header( "location:gestion.php" );
+}elseif($email=='administration@administration' && $password=='administration'){
+	$_SESSION['log']="administration";
+	header( "location:administration.php" );
 }	
 }
 ?>

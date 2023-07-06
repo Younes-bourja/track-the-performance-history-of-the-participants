@@ -9,7 +9,8 @@ if(isset($_POST['payment'])){
   
   mysqli_query($con," UPDATE clients SET date1=date2  WHERE id='$id';");
   mysqli_query($con," UPDATE clients SET date2=DATE_ADD(date2, INTERVAL $month month )  WHERE id='$id';");
-  
+  mysqli_query($con," UPDATE solde SET solde=solde+200*$month  WHERE salle='salle1' AND etat='active';");
+
   $_SESSION['message']=" لقد تم أداء الواجب الشهري بنجاح";
   }
   
@@ -19,10 +20,18 @@ if(isset($_POST['payment'])){
     if($id==""){$id=="الجميع";}
     $day=$_POST["days"];
     if($id!="الجميع" && $id>0){
+      $name=$_POST["name"];
+      $message="  تمت  إضافة $day  يوم  بنجاح   للنمخرط  &nbsp;&nbsp; $name  &nbsp;&nbsp;";
+      mysqli_query($con," INSERT INTO notification(name,objet,date,etat)
+     VALUES ( 'admin','$message',CURRENT_DATE,'en cour')");
       mysqli_query($con," UPDATE clients SET date2=DATE_ADD(date2, INTERVAL $day day )  WHERE status='active' AND id LIKE $id;");
       $_SESSION['message']=" تمت  إضافة $day  يوم للنمخرط بنجاح ";
 
     }elseif($id="الجميع"){
+      $message="تمت  إضافة  $day  يوم للجميع  ";
+      mysqli_query($con," INSERT INTO notification(name,objet,date,etat)
+      VALUES ( 'admin','$message',CURRENT_DATE,'en cour')");
+      
       mysqli_query($con," UPDATE clients SET  date2 =DATE_ADD(date2, INTERVAL $day day ) WHERE status='active';");
       $_SESSION['message']="تمت  إضافة  $day  يوم للجميع  ";
     };
@@ -51,8 +60,13 @@ if(isset($_POST['payment'])){
   $image_tmp = $_FILES["image"]["tmp_name"];
   move_uploaded_file($_FILES["image"]["tmp_name"],$upload);
 
-   mysqli_query($con," INSERT INTO clients(image,client,phone,date,date1,date2,status)
-     VALUES ( '$photo','$name','$phone', '$date', '$date1','$date2','active')");
+       $message=" لقد تم إضافة منخرط جديد  بنجاح"; 
+       mysqli_query($con," INSERT INTO notification (name,objet,date,etat)
+         VALUES ( 'admin','$message',CURRENT_DATE,'en cour')");
+mysqli_query($con," INSERT INTO clients(image,client,phone,date,date1,date2,status)
+VALUES ( '$photo','$name','$phone', '$date', '$date1','$date2','active')");
+  mysqli_query($con," UPDATE solde SET solde=solde+200  WHERE salle='salle1' AND etat='active';");
+
      $_SESSION['message']=" لقد تم إضافة منخرط جديد  بنجاح"; 
 
 }else{

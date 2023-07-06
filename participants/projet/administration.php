@@ -1,11 +1,9 @@
 <?php session_start();
-if($_SESSION['log']=='login'){
+if($_SESSION['log']=='administration'){
 }else{header( "location:login.php" );}
 $_SESSION['message']="";
 include('connectiondata.php') ;
-mysqli_query($con,"UPDATE  clients SET status='inactive' WHERE DATEDIFF(date2,CURRENT_DATE) BETWEEN -300 AND -11 ORDER BY id ASC  ");
-
-include('operationsalle.php') ;?>
+include('operation2.php') ;?>
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -21,7 +19,7 @@ include('operationsalle.php') ;?>
 <link href="../public/assets/plugins/fileuploads/css/fileupload.css" rel="stylesheet" type="text/css"/>
 </head>
 <body class="main-body bg-primary-transparent">
-<?php include('layouts/main-header3.php') ?>
+<?php include('layouts/main-header2.php') ?>
 	<div class="container-fluid " >
 <div id="global-loader">
 			<img src="../public/assets/img/loader.svg" class="loader-img" alt="Loader">
@@ -30,9 +28,8 @@ include('operationsalle.php') ;?>
 				<div class="breadcrumb-header justify-content-between">
 					<div class="" style="position: absolute;top:75px">
 						<div class="d-flex">
-						<h4 class="content-title  my-auto">    الصفحة الرئيسية :  </h4><span class="text-muted mt-1 tx-13 mr-2 mb-0"> </span>
-					
-					</div>
+							<h4 class="content-title  my-auto">    الصفحة الرئيسية :  </h4><span class="text-muted mt-1 tx-13 mr-2 mb-0"> </span>
+						</div>
 					</div>
 				
 						
@@ -49,14 +46,58 @@ include('operationsalle.php') ;?>
 							</div>
 							<div class="card-body ">
 								<div class="table ">
+								<table class="table table-hover bg-light text-md-nowrap">
+										<thead>
+											<tr>
+											<th class=" tx-22"> اسم القاعة </th>                                           
+                                            <th class=" tx-16"> الرصيد</th>
+										    
+											<th  class="text-center"> </th>
+
+											</tr>
+										</thead>
+										<tbody>
+										<?php 
+ 
+										$resultsearch=mysqli_query($con,"SELECT * FROM solde WHERE etat='active' ORDER BY id  DESC ");
+             while($rows =$resultsearch ->fetch_assoc()): 
+             ;?> 
+											<tr>
+											
+											<td class=" tx-16" > <?php echo $rows['salle']; ?></td>
+											<td class="text-success tx-16"> <?php echo $rows['solde'].'.00'; ?></td>
+											
+											
+											
+                                            <td class="text-center" style="direction: ltr">
+											<?php if($rows['etat']=="active"):?>
+
+											<button class="btn btn-teal btn-sm tx-16 btn-rounded w-50 text-white"
+											 data-toggle="modal" data-target="#myModal14"
+											       data-d-salle="<?php echo $rows['salle']; ?>" 
+													data-d-solde="<?php echo $rows['solde']; ?>" 
+													data-d-id="<?php echo $rows['id']; ?>"
+											<?php	if($rows['solde']<=0){echo "style='pointer-events: none;background-color:silver;'";} ?>  >
+                                                 إستلام المبلغ</button>
+												 <?php elseif($rows['etat']=="archive"): ?>
+													تاريخ إستلام الرصيد:
+													<span style="direction: ltr" class="mr-4" ><?php   echo  mb_strimwidth($rows['date'],0, 11); ?></span>
+													<i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                                         <?php endif; ?>
+                                        </td>
+										
+									
+                                            
+											</tr>
+											<?php endwhile; ?>
+										</tbody>
+									</table>
 								<table class="table table-hover bg-light text-md-nowrap" id="example1">
 										<thead>
 											<tr>
-                                            <th class="text-center" > الصورة</th>
-											<th> إسم المنخرط</th>                                           
-                                            <th>تاريخ الأنخراط</th>
-										    <th>تاريخ الاستفادة </th>
-                                            <th> تاريخ الأداء</th>
+											<th class=" tx-22"> اسم القاعة </th>                                           
+                                            <th class=" tx-16"> الرصيد</th>
+										    
 											<th  class="text-center"> المعلومات</th>
 
 											</tr>
@@ -64,36 +105,31 @@ include('operationsalle.php') ;?>
 										<tbody>
 										<?php 
  
-										$resultsearch=mysqli_query($con,"SELECT * FROM clients WHERE status='active' ORDER BY id DESC  ");
+										$resultsearch=mysqli_query($con,"SELECT * FROM solde WHERE etat='archive' ORDER BY id  DESC ");
              while($rows =$resultsearch ->fetch_assoc()): 
              ;?> 
 											<tr>
-											<td class="text-center">
-											<img alt="avatar" class="rounded-circle avatar-lg mr-2" src="images/<?php echo $rows['image']; ?>">
-											</td>
-											<td> <?php echo $rows['client']; ?></td>
-											<td> <?php echo $rows['date']; ?></td>
 											
-											<td><?php echo $rows['date1']; ?></td>
-											<td><?php echo $rows['date2']; ?></td>
+											<td class=" tx-16" > <?php echo $rows['salle']; ?></td>
+											<td class="text-success tx-16"> <?php echo $rows['solde'].'.00'; ?></td>
 											
 											
-                                            <td class="text-center">
+											
+                                            <td class="text-center" style="direction: ltr">
+											<?php if($rows['etat']=="active"):?>
 
-											<a 
+											<button class="btn btn-teal btn-sm tx-16 btn-rounded w-50 text-white"
 											 data-toggle="modal" data-target="#myModal14"
-											       data-d-client="<?php echo $rows['client']; ?>" 
-													data-d-date="<?php echo $rows['date']; ?>" 
-													data-d-image="<?php echo $rows['image']; ?>" 
-													data-d-date2="<?php echo $rows['date2']; ?>"
-													data-d-phone="<?php echo $rows['phone']; ?>"  >
-                    <svg class="btn btn-outline-info btn-sm dropdown-toggle text-center mt-3" 
-                    style="height:25px;border-radius: 3rem;"
-xmlns="http://www.w3.org/2000/svg" width="60" height="40" fill="currentColor" class="bi bi-eye mb-2" viewBox="0 0 16 16">
-  <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-  <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-</svg>	 </a>
-       
+											       data-d-salle="<?php echo $rows['salle']; ?>" 
+													data-d-solde="<?php echo $rows['solde']; ?>" 
+													data-d-id="<?php echo $rows['id']; ?>"
+											<?php	if($rows['solde']<=0){echo "style='pointer-events: none;background-color:silver;'";} ?>  >
+                                                 إستلام المبلغ</button>
+												 <?php elseif($rows['etat']=="archive"): ?>
+													تاريخ إستلام الرصيد:
+													<span style="direction: ltr" class="mr-4" ><?php   echo  mb_strimwidth($rows['date'],0, 11); ?></span>
+													<i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                                         <?php endif; ?>
                                         </td>
 										
 									
@@ -113,6 +149,7 @@ xmlns="http://www.w3.org/2000/svg" width="60" height="40" fill="currentColor" cl
 		<div id="myModal14" class="modal fade bg-secondary-gradient" role="dialog">
 		<div class="modal-dialog modal-dialog-centered " role="document">
 			<div class="modal-content modal-md center">
+				
 		<div class="row">
 
 					<div class="col-md-12 ">
@@ -125,24 +162,27 @@ xmlns="http://www.w3.org/2000/svg" width="60" height="40" fill="currentColor" cl
 							
 							<div class="card-body">
 							 	<div class="">
-								 <h4 class="card-title" id="d-client" ></h4>
-								 <h6 class="card-title" id="d-phone" ></h6>
-			
-						
+							
+						<div class="input-group mb-2 mt-4  ">
+  <div class="input-group-prepend text-center w-0">
+    <span class="input-group-text " id="basic-addon1"> اسم القاعة    : &nbsp;&nbsp;&nbsp;</span>
+  </div>
+  <span class="form-control text-center bg-light"  id="d-salle"    disabled></span>
+</div>
 								<div class="input-group mb-3  ">
   <div class="input-group-prepend text-center w-0">
-    <span class="input-group-text " id="basic-addon1">تاريخ الإنخراط     : </span>
+    <span class="input-group-text " id="basic-addon1">الرصيد      : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
   </div>
-  <span  class="form-control text-center bg-light"   id="d-date"  disabled ></span>
+  <span  class="form-control text-center bg-light text-success"   id="d-solde"  disabled ></span>
 </div>  
-<div class="input-group mb-2  ">
-  <div class="input-group-prepend text-center w-0">
-    <span class="input-group-text " id="basic-addon1">تاريخ الاداء    : &nbsp;&nbsp;&nbsp;</span>
-  </div>
-  <span class="form-control text-center bg-light"  id="d-date2"    disabled></span>
-</div>    	
+<input  class="form-control text-center bg-light" name="d-id"  id="d-id"  hidden >
 </div>
 							</div>
+							<button class="btn btn-indigo btn-rounded w-75" 
+							style="margin: auto;" name="confirmation" type="submit" id="bmbm">
+
+									تأكيد إستلام الرصيد
+							</button><br>	
 						 </div>
 					</form>
 					</div>
@@ -197,19 +237,15 @@ xmlns="http://www.w3.org/2000/svg" width="60" height="40" fill="currentColor" cl
 <script>
 $('#myModal14').on('show.bs.modal',function(event){
 var button=$(event.relatedTarget);
-var date=button.data('d-date');
-var image=button.data('d-image');
-var date2=button.data('d-date2');
-var client=button.data('d-client');
-var phone=button.data('d-phone');
-img='<img style="height:450px;width:100%;" src="images/'+image+'">';
+var id=button.data('d-id');
+var salle=button.data('d-salle');
+var solde=button.data('d-solde');
 var modal=$(this)
-document.getElementById("d-date").innerHTML = date;
-document.getElementById("d-date2").innerHTML = date2;
-document.getElementById("d-client").innerHTML = client;
-document.getElementById("d-phone").innerHTML = phone;
+document.getElementById("d-salle").innerHTML = salle;
+document.getElementById("d-solde").innerHTML = solde+".00";
+document.getElementById("d-id").value = id;
 
-document.getElementById("d-img").innerHTML = img;
+
 });
 	
 </script>
